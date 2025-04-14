@@ -11,3 +11,4 @@ Estructura:
 - `nodo_cpp`: Trabajador en C++.
 - `shared`: Archivos compartidos (.ice).
 - `texts`: Archivos de texto para procesar.
+

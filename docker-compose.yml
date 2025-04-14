@@ -6,42 +6,30 @@ services:
       context: .
       dockerfile: maestro/Dockerfile
     container_name: maestro
-    working_dir: /app
     stdin_open: true
     tty: true
+    ports:
+      - "80:80"
     volumes:
       - ./texts:/app/texts
       - /tmp/chunks:/app/chunks
       - ./referencias:/app/referencias
       - ./shared:/app/shared
     depends_on:
-      - nodo_java
-      - nodo_cpp
+      - nodo_java_1
+      - nodo_java_2
+      - nodo_java_3
+      - nodo_java_4
     networks:
       - ice_network
 
-  nodo_cpp:
-    build:
-      context: .
-      dockerfile: nodo_cpp/Dockerfile
-    container_name: nodo_cpp
-    working_dir: /app
-    volumes:
-      - ./texts:/app/texts
-      - /tmp/chunks:/app/chunks
-      - ./results:/app/results
-      - ./shared:/app/shared
-    expose:
-      - "10001"
-    networks:
-      - ice_network
-
-  nodo_java:
+  nodo_java_1:
     build:
       context: .
       dockerfile: nodo_java/Dockerfile
-    container_name: nodo_java
-    working_dir: /app
+    container_name: nodo_java_1
+    environment:
+      - WORKER_NAME=JavaWorker1
     volumes:
       - ./texts:/app/texts
       - /tmp/chunks:/app/chunks
@@ -52,15 +40,57 @@ services:
     networks:
       - ice_network
 
-  scope:
-    image: weaveworks/scope:1.13.2
-    container_name: scope
-    privileged: true
-    pid: "host"
-    network_mode: "host"
+  nodo_java_2:
+    build:
+      context: .
+      dockerfile: nodo_java/Dockerfile
+    container_name: nodo_java_2
+    environment:
+      - WORKER_NAME=JavaWorker2
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: always
+      - ./texts:/app/texts
+      - /tmp/chunks:/app/chunks
+      - ./results:/app/results
+      - ./shared:/app/shared
+    expose:
+      - "10000"
+    networks:
+      - ice_network
+
+  nodo_java_3:
+    build:
+      context: .
+      dockerfile: nodo_java/Dockerfile
+    container_name: nodo_java_3
+    environment:
+      - WORKER_NAME=JavaWorker3
+    volumes:
+      - ./texts:/app/texts
+      - /tmp/chunks:/app/chunks
+      - ./results:/app/results
+      - ./shared:/app/shared
+    expose:
+      - "10000"
+    networks:
+      - ice_network
+
+  nodo_java_4:
+    build:
+      context: .
+      dockerfile: nodo_java/Dockerfile
+    container_name: nodo_java_4
+    environment:
+      - WORKER_NAME=JavaWorker4
+    volumes:
+      - ./texts:/app/texts
+      - /tmp/chunks:/app/chunks
+      - ./results:/app/results
+      - ./shared:/app/shared
+    expose:
+      - "10000"
+    networks:
+      - ice_network
 
 networks:
   ice_network:
+    driver: bridge

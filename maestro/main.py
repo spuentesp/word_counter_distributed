@@ -1,95 +1,151 @@
-import sys
 import Ice
 import os
+import time
+from flask import Flask, request, render_template_string
 from pathlib import Path
 from collections import Counter
 
-Ice.loadSlice('../shared/WordCount.ice')
+Ice.loadSlice('./shared/WordCount.ice')
 import WordCounter
 
+app = Flask(__name__)
+
+HTML = """
+<!DOCTYPE html>
+<html>
+<head><title>Word Counter</title></head>
+<body>
+  <h1>Word Counter</h1>
+  <form action="/count" method="post" enctype="multipart/form-data">
+    <label>Upload .txt file:</label><br>
+    <input type="file" name="file" accept=".txt" required><br><br>
+    <label>Words to search (space-separated):</label><br>
+    <input type="text" name="words" required><br><br>
+    <input type="checkbox" name="with_context"> With context<br><br>
+    <input type="submit" value="Process">
+  </form>
+  {% if error %}
+    <p style="color:red;"><strong>Error:</strong> {{ error }}</p>
+  {% endif %}
+  {% if results %}
+    <h2>Results:</h2>
+    <ul>
+      {% for word, count in results.items() %}
+        <li>{{ word }}: {{ count }}</li>
+      {% endfor %}
+    </ul>
+    {% if contexts %}
+      <h3>Contexts:</h3>
+      <pre>{{ contexts }}</pre>
+    {% endif %}
+  {% endif %}
+</body>
+</html>
+"""
+# Combina múltiples resultados parciales de conteo de palabras
 def merge_counts(counts_list):
     total = Counter()
     for c in counts_list:
         total.update(c)
     return total
 
-def split_file(filepath, num_chunks):
-    Path("/tmp/chunks").mkdir(parents=True, exist_ok=True)
-    with open(filepath, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-
-    chunk_size = len(lines) // num_chunks
+# Divide el texto completo en `num_chunks` partes basadas en palabras
+def split_text(text, num_chunks):
+    words = text.split()
+    chunk_size = len(words) // num_chunks
     chunks = []
 
     for i in range(num_chunks):
         start = i * chunk_size
         end = None if i == num_chunks - 1 else (i + 1) * chunk_size
-        chunk_lines = lines[start:end]
-
-        chunk_path = f"/tmp/chunks/chunk_{i}.txt"
-        with open(chunk_path, "w", encoding="utf-8") as chunk_file:
-            chunk_file.writelines(chunk_lines)
-
-        chunks.append(chunk_path)
+        chunk = " ".join(words[start:end])
+        chunks.append(chunk)
 
     return chunks
 
-def main():
-    with Ice.initialize(sys.argv) as communicator:
-        workers = [
-            ("JavaWorker", "nodo_java", 10000),
-            ("CppWorker", "nodo_cpp", 10001),
-        ]
+# Ruta raíz: formulario de entrada
+@app.route('/', methods=['GET'])
+def index():
+    return render_template_string(HTML)
 
-        print("📂 Ruta del archivo a procesar:")
-        filepath = input("> ").strip()
+# Procesa el archivo subido y busca palabras en los workers
+@app.route('/count', methods=['POST'])
+def count():
+    # Obtener archivo y palabras a buscar
+    file = request.files['file']
+    words = request.form['words'].strip().lower().split()
+    with_context = 'with_context' in request.form
 
-        if not os.path.isfile(filepath):
-            print("❌ Archivo no encontrado.")
-            return
+    # Leer texto y dividir en chunks
+    text = file.read().decode('utf-8')
+    
 
-        print("🔍 Palabras a buscar (separadas por espacio):")
-        palabras = input("> ").strip().lower().split()
-        if not palabras:
-            print("❌ Debes ingresar al menos una palabra.")
-            return
+    results = Counter()
+    all_contexts = []
 
-        chunk_paths = split_file(filepath, len(workers))
+    # Lista de workers disponibles (nombre lógico, host, puerto)
+    workers = [
+        ("JavaWorker1", "nodo_java_1", 10000),
+        ("JavaWorker2", "nodo_java_2", 10000),
+        ("JavaWorker3", "nodo_java_3", 10000),
+        ("JavaWorker4", "nodo_java_4", 10000),
+    ]
 
-        proxies = []
+    chunks = split_text(text, len(workers))
+    proxies = []
+
+    # Inicializa la comunicación ICE
+    with Ice.initialize([]) as communicator:
+        # Conecta con cada worker
         for name, host, port in workers:
-            proxy = WordCounter.WorkerPrx.checkedCast(
-                communicator.stringToProxy(f"{name}:default -h {host} -p {port}")
-            )
+            max_retries = 5
+            retry_delay = 1
+            proxy = None
+
+            for attempt in range(1, max_retries + 1):
+                try:
+                    print(f"🔌 Attempt {attempt}: connecting to {name} at {host}:{port}")
+                    proxy = WordCounter.WorkerPrx.checkedCast(
+                        communicator.stringToProxy(f"{name}:default -h {host} -p {port}")
+                    )
+                    if proxy:
+                        print(f"✅ Connected to {name}")
+                        break
+                except Exception as e:
+                    last_error = str(e)
+                    print(f"❌ Error connecting to {name} (attempt {attempt}): {last_error}")
+                time.sleep(retry_delay)
+                retry_delay *= 2
+
             if not proxy:
-                print(f"❌ No se pudo conectar con {name}")
-                return
+                return render_template_string(
+                    HTML,
+                    error=f"❌ No se pudo conectar con {name} en {host}:{port} después de {max_retries} intentos. Último error: {last_error}"
+                )
+
             proxies.append(proxy)
 
-        all_counts = []
-        all_contexts = []
+        # Enviar cada chunk al worker correspondiente
+        for i, (proxy, chunk) in enumerate(zip(proxies, chunks)):
+            try:
+                print(f"📤 Sending chunk {i} to {proxy.ice_getIdentity().name}")
+                result = proxy.searchWordsWithContext(chunk, words)
+                results.update(result.counts)
+                if with_context:
+                    all_contexts.extend(result.contexts)
+            except Exception as e:
+                return render_template_string(
+                    HTML,
+                    error=f"❌ Fallo al procesar con {proxy.ice_getIdentity().name}: {e}"
+                )
 
-        for i, (proxy, chunk_path) in enumerate(zip(proxies, chunk_paths)):
-            print(f"📤 Enviando chunk {i} → {proxy.ice_getIdentity().name}")
-            result = proxy.searchWordsWithContext(chunk_path, palabras)
-            all_counts.append(result.counts)
-            all_contexts.extend(result.contexts)
+    # Mostrar resultados en la misma página
+    return render_template_string(
+        HTML,
+        results=results,
+        contexts="\n".join(all_contexts) if with_context else None
+    )
 
-        final_counts = merge_counts(all_counts)
-
-        print("\n📊 Conteo total de palabras:")
-        for word in palabras:
-            print(f"{word}: {final_counts.get(word, 0)}")
-
-        respuesta = input("\n📝 ¿Deseas guardar las referencias encontradas en un archivo? (y/n): ").strip().lower()
-        if respuesta == "y":
-            output_path = "referencias_output.txt"
-            with open(output_path, "w", encoding="utf-8") as f:
-                for ctx in all_contexts:
-                    f.write(ctx + "\n")
-            print(f"✅ Referencias guardadas en {output_path}")
-        else:
-            print("❎ Referencias descartadas.")
-
-if __name__ == "__main__":
-    main()
+# Iniciar el servidor Flask
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=80)

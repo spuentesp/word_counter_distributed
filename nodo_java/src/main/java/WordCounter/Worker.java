@@ -17,7 +17,7 @@ package WordCounter;
 
 public interface Worker extends com.zeroc.Ice.Object
 {
-    SearchResult searchWordsWithContext(String filepath, String[] words, com.zeroc.Ice.Current current);
+    SearchResult searchWordsWithContext(String chunk, String[] words, com.zeroc.Ice.Current current);
 
     /** @hidden */
     static final String[] _iceIds =
@@ -54,12 +54,12 @@ public interface Worker extends com.zeroc.Ice.Object
     {
         com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
         com.zeroc.Ice.InputStream istr = inS.startReadParams();
-        String iceP_filepath;
+        String iceP_chunk;
         String[] iceP_words;
-        iceP_filepath = istr.readString();
+        iceP_chunk = istr.readString();
         iceP_words = istr.readStringSeq();
         inS.endReadParams();
-        SearchResult ret = obj.searchWordsWithContext(iceP_filepath, iceP_words, current);
+        SearchResult ret = obj.searchWordsWithContext(iceP_chunk, iceP_words, current);
         com.zeroc.Ice.OutputStream ostr = inS.startWriteParams();
         SearchResult.ice_write(ostr, ret);
         inS.endWriteParams(ostr);

@@ -24,5 +24,6 @@ RUN mkdir -p build && cd build && \
     cmake ../nodo_cpp && \
     make
 
+EXPOSE 10000
 # Run
 CMD ["./build/nodo_cpp"]

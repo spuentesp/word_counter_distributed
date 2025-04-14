@@ -10,6 +10,7 @@ module WordCounter {
     };
 
     interface Worker {
-        SearchResult searchWordsWithContext(string chunk, StringList words);
+        SearchResult searchWordsWithContext(string filepath, StringList words);
     };
 };
+

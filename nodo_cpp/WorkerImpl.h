@@ -8,7 +8,7 @@ namespace WordCounter {
 
 class WorkerImpl : public Worker {
 public:
-    virtual SearchResult searchWordsWithContext(const std::string& filepath, const StringList& words, const Ice::Current&) override;
+    virtual SearchResult searchWordsWithContext(const std::string& chunk, const StringList& words, const Ice::Current&) override;
 };
 
 }

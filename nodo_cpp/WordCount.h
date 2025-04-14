@@ -124,7 +124,7 @@ public:
      */
     static const ::std::string& ice_staticId();
 
-    virtual SearchResult searchWordsWithContext(::std::string filepath, StringList words, const ::Ice::Current& current) = 0;
+    virtual SearchResult searchWordsWithContext(::std::string chunk, StringList words, const ::Ice::Current& current) = 0;
     /// \cond INTERNAL
     bool _iceD_searchWordsWithContext(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
@@ -143,26 +143,26 @@ class WorkerPrx : public virtual ::Ice::Proxy<WorkerPrx, ::Ice::ObjectPrx>
 {
 public:
 
-    SearchResult searchWordsWithContext(const ::std::string& filepath, const StringList& words, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    SearchResult searchWordsWithContext(const ::std::string& chunk, const StringList& words, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return _makePromiseOutgoing<::WordCounter::SearchResult>(true, this, &WorkerPrx::_iceI_searchWordsWithContext, filepath, words, context).get();
+        return _makePromiseOutgoing<::WordCounter::SearchResult>(true, this, &WorkerPrx::_iceI_searchWordsWithContext, chunk, words, context).get();
     }
 
     template<template<typename> class P = ::std::promise>
-    auto searchWordsWithContextAsync(const ::std::string& filepath, const StringList& words, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    auto searchWordsWithContextAsync(const ::std::string& chunk, const StringList& words, const ::Ice::Context& context = ::Ice::noExplicitContext)
         -> decltype(::std::declval<P<::WordCounter::SearchResult>>().get_future())
     {
-        return _makePromiseOutgoing<::WordCounter::SearchResult, P>(false, this, &WorkerPrx::_iceI_searchWordsWithContext, filepath, words, context);
+        return _makePromiseOutgoing<::WordCounter::SearchResult, P>(false, this, &WorkerPrx::_iceI_searchWordsWithContext, chunk, words, context);
     }
 
     ::std::function<void()>
-    searchWordsWithContextAsync(const ::std::string& filepath, const StringList& words,
+    searchWordsWithContextAsync(const ::std::string& chunk, const StringList& words,
                                 ::std::function<void(::WordCounter::SearchResult)> response,
                                 ::std::function<void(::std::exception_ptr)> ex = nullptr,
                                 ::std::function<void(bool)> sent = nullptr,
                                 const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return _makeLamdaOutgoing<::WordCounter::SearchResult>(std::move(response), std::move(ex), std::move(sent), this, &WordCounter::WorkerPrx::_iceI_searchWordsWithContext, filepath, words, context);
+        return _makeLamdaOutgoing<::WordCounter::SearchResult>(std::move(response), std::move(ex), std::move(sent), this, &WordCounter::WorkerPrx::_iceI_searchWordsWithContext, chunk, words, context);
     }
 
     /// \cond INTERNAL
@@ -293,34 +293,34 @@ class Worker : public virtual ::Ice::Proxy<Worker, ::IceProxy::Ice::Object>
 {
 public:
 
-    ::WordCounter::SearchResult searchWordsWithContext(const ::std::string& filepath, const ::WordCounter::StringList& words, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    ::WordCounter::SearchResult searchWordsWithContext(const ::std::string& chunk, const ::WordCounter::StringList& words, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return end_searchWordsWithContext(_iceI_begin_searchWordsWithContext(filepath, words, context, ::IceInternal::dummyCallback, 0, true));
+        return end_searchWordsWithContext(_iceI_begin_searchWordsWithContext(chunk, words, context, ::IceInternal::dummyCallback, 0, true));
     }
 
-    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& filepath, const ::WordCounter::StringList& words, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& chunk, const ::WordCounter::StringList& words, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return _iceI_begin_searchWordsWithContext(filepath, words, context, ::IceInternal::dummyCallback, 0);
+        return _iceI_begin_searchWordsWithContext(chunk, words, context, ::IceInternal::dummyCallback, 0);
     }
 
-    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& filepath, const ::WordCounter::StringList& words, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& chunk, const ::WordCounter::StringList& words, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_searchWordsWithContext(filepath, words, ::Ice::noExplicitContext, cb, cookie);
+        return _iceI_begin_searchWordsWithContext(chunk, words, ::Ice::noExplicitContext, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& filepath, const ::WordCounter::StringList& words, const ::Ice::Context& context, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& chunk, const ::WordCounter::StringList& words, const ::Ice::Context& context, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_searchWordsWithContext(filepath, words, context, cb, cookie);
+        return _iceI_begin_searchWordsWithContext(chunk, words, context, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& filepath, const ::WordCounter::StringList& words, const ::WordCounter::Callback_Worker_searchWordsWithContextPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& chunk, const ::WordCounter::StringList& words, const ::WordCounter::Callback_Worker_searchWordsWithContextPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_searchWordsWithContext(filepath, words, ::Ice::noExplicitContext, cb, cookie);
+        return _iceI_begin_searchWordsWithContext(chunk, words, ::Ice::noExplicitContext, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& filepath, const ::WordCounter::StringList& words, const ::Ice::Context& context, const ::WordCounter::Callback_Worker_searchWordsWithContextPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_searchWordsWithContext(const ::std::string& chunk, const ::WordCounter::StringList& words, const ::Ice::Context& context, const ::WordCounter::Callback_Worker_searchWordsWithContextPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_searchWordsWithContext(filepath, words, context, cb, cookie);
+        return _iceI_begin_searchWordsWithContext(chunk, words, context, cb, cookie);
     }
 
     ::WordCounter::SearchResult end_searchWordsWithContext(const ::Ice::AsyncResultPtr& result);
@@ -394,7 +394,7 @@ public:
      */
     static const ::std::string& ice_staticId();
 
-    virtual SearchResult searchWordsWithContext(const ::std::string& filepath, const StringList& words, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
+    virtual SearchResult searchWordsWithContext(const ::std::string& chunk, const StringList& words, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
     /// \cond INTERNAL
     bool _iceD_searchWordsWithContext(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond

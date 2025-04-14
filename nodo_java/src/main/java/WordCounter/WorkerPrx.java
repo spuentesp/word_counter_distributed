@@ -17,39 +17,39 @@ package WordCounter;
 
 public interface WorkerPrx extends com.zeroc.Ice.ObjectPrx
 {
-    default SearchResult searchWordsWithContext(String filepath, String[] words)
+    default SearchResult searchWordsWithContext(String chunk, String[] words)
     {
-        return searchWordsWithContext(filepath, words, com.zeroc.Ice.ObjectPrx.noExplicitContext);
+        return searchWordsWithContext(chunk, words, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default SearchResult searchWordsWithContext(String filepath, String[] words, java.util.Map<String, String> context)
+    default SearchResult searchWordsWithContext(String chunk, String[] words, java.util.Map<String, String> context)
     {
-        return _iceI_searchWordsWithContextAsync(filepath, words, context, true).waitForResponse();
+        return _iceI_searchWordsWithContextAsync(chunk, words, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<SearchResult> searchWordsWithContextAsync(String filepath, String[] words)
+    default java.util.concurrent.CompletableFuture<SearchResult> searchWordsWithContextAsync(String chunk, String[] words)
     {
-        return _iceI_searchWordsWithContextAsync(filepath, words, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+        return _iceI_searchWordsWithContextAsync(chunk, words, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<SearchResult> searchWordsWithContextAsync(String filepath, String[] words, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<SearchResult> searchWordsWithContextAsync(String chunk, String[] words, java.util.Map<String, String> context)
     {
-        return _iceI_searchWordsWithContextAsync(filepath, words, context, false);
+        return _iceI_searchWordsWithContextAsync(chunk, words, context, false);
     }
 
     /**
      * @hidden
-     * @param iceP_filepath -
+     * @param iceP_chunk -
      * @param iceP_words -
      * @param context -
      * @param sync -
      * @return -
      **/
-    default com.zeroc.IceInternal.OutgoingAsync<SearchResult> _iceI_searchWordsWithContextAsync(String iceP_filepath, String[] iceP_words, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<SearchResult> _iceI_searchWordsWithContextAsync(String iceP_chunk, String[] iceP_words, java.util.Map<String, String> context, boolean sync)
     {
         com.zeroc.IceInternal.OutgoingAsync<SearchResult> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "searchWordsWithContext", null, sync, null);
         f.invoke(true, context, null, ostr -> {
-                     ostr.writeString(iceP_filepath);
+                     ostr.writeString(iceP_chunk);
                      ostr.writeStringSeq(iceP_words);
                  }, istr -> {
                      SearchResult ret;

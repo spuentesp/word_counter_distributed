@@ -95,11 +95,11 @@ WordCounter::Worker::_iceD_searchWordsWithContext(::IceInternal::Incoming& inS, 
 {
     _iceCheckMode(::Ice::OperationMode::Normal, current.mode);
     auto istr = inS.startReadParams();
-    ::std::string iceP_filepath;
+    ::std::string iceP_chunk;
     StringList iceP_words;
-    istr->readAll(iceP_filepath, iceP_words);
+    istr->readAll(iceP_chunk, iceP_words);
     inS.endReadParams();
-    SearchResult ret = this->searchWordsWithContext(::std::move(iceP_filepath), ::std::move(iceP_words), current);
+    SearchResult ret = this->searchWordsWithContext(::std::move(iceP_chunk), ::std::move(iceP_words), current);
     auto ostr = inS.startWriteParams();
     ostr->writeAll(ret);
     inS.endWriteParams();
@@ -150,13 +150,13 @@ WordCounter::Worker::_iceDispatch(::IceInternal::Incoming& in, const ::Ice::Curr
 
 /// \cond INTERNAL
 void
-WordCounter::WorkerPrx::_iceI_searchWordsWithContext(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<::WordCounter::SearchResult>>& outAsync, const ::std::string& iceP_filepath, const StringList& iceP_words, const ::Ice::Context& context)
+WordCounter::WorkerPrx::_iceI_searchWordsWithContext(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<::WordCounter::SearchResult>>& outAsync, const ::std::string& iceP_chunk, const StringList& iceP_words, const ::Ice::Context& context)
 {
     _checkTwowayOnly(iceC_WordCounter_Worker_searchWordsWithContext_name);
     outAsync->invoke(iceC_WordCounter_Worker_searchWordsWithContext_name, ::Ice::OperationMode::Normal, ::Ice::FormatType::DefaultFormat, context,
         [&](::Ice::OutputStream* ostr)
         {
-            ostr->writeAll(iceP_filepath, iceP_words);
+            ostr->writeAll(iceP_chunk, iceP_words);
         },
         nullptr);
 }
@@ -210,7 +210,7 @@ void
 /// \endcond
 
 ::Ice::AsyncResultPtr
-IceProxy::WordCounter::Worker::_iceI_begin_searchWordsWithContext(const ::std::string& iceP_filepath, const ::WordCounter::StringList& iceP_words, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
+IceProxy::WordCounter::Worker::_iceI_begin_searchWordsWithContext(const ::std::string& iceP_chunk, const ::WordCounter::StringList& iceP_words, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
 {
     _checkTwowayOnly(iceC_WordCounter_Worker_searchWordsWithContext_name, sync);
     ::IceInternal::OutgoingAsyncPtr result = new ::IceInternal::CallbackOutgoing(this, iceC_WordCounter_Worker_searchWordsWithContext_name, del, cookie, sync);
@@ -218,7 +218,7 @@ IceProxy::WordCounter::Worker::_iceI_begin_searchWordsWithContext(const ::std::s
     {
         result->prepare(iceC_WordCounter_Worker_searchWordsWithContext_name, ::Ice::Normal, context);
         ::Ice::OutputStream* ostr = result->startWriteParams(::Ice::DefaultFormat);
-        ostr->write(iceP_filepath);
+        ostr->write(iceP_chunk);
         ostr->write(iceP_words);
         result->endWriteParams();
         result->invoke(iceC_WordCounter_Worker_searchWordsWithContext_name);
@@ -320,12 +320,12 @@ WordCounter::Worker::_iceD_searchWordsWithContext(::IceInternal::Incoming& inS, 
 {
     _iceCheckMode(::Ice::Normal, current.mode);
     ::Ice::InputStream* istr = inS.startReadParams();
-    ::std::string iceP_filepath;
+    ::std::string iceP_chunk;
     StringList iceP_words;
-    istr->read(iceP_filepath);
+    istr->read(iceP_chunk);
     istr->read(iceP_words);
     inS.endReadParams();
-    SearchResult ret = this->searchWordsWithContext(iceP_filepath, iceP_words, current);
+    SearchResult ret = this->searchWordsWithContext(iceP_chunk, iceP_words, current);
     ::Ice::OutputStream* ostr = inS.startWriteParams();
     ostr->write(ret);
     inS.endWriteParams();
