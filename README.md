@@ -17,19 +17,17 @@ Este proyecto implementa un sistema distribuido usando **ZeroC ICE**, donde:
 
 ```mermaid
 graph TD
-    subgraph Red ICE
-        Texto[Archivo de texto]
-        Texto -->|Divide y envía chunks| Maestro[Maestro (Python)]
-        Maestro -->|Llama a searchWordsWithContext| Java1[Nodo Java 1]
-        Maestro --> Java2[Nodo Java 2]
-        Maestro --> Java3[Nodo Java 3]
-        Maestro --> Java4[Nodo Java 4]
-        Java1 -->|Resultados parciales| Maestro
-        Java2 --> Maestro
-        Java3 --> Maestro
-        Java4 --> Maestro
-        Maestro -->|Resultados finales| Usuario
-    end
+    A[Archivo de texto] --> B[Maestro]
+    B --> C1[Nodo Java 1]
+    B --> C2[Nodo Java 2]
+    B --> C3[Nodo Java 3]
+    B --> C4[Nodo Java 4]
+    C1 --> B
+    C2 --> B
+    C3 --> B
+    C4 --> B
+    B --> D[Usuario final]
+
 ```
 
 ## Cómo Funciona
