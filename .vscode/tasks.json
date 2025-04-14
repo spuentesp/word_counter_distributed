@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Generate slice2py",
+        "type": "shell",
+        "command": "slice2py -Ishared shared/WordCount.ice -o maestro/",
+        "group": "build"
+      },
+      {
+        "label": "Generate slice2cpp",
+        "type": "shell",
+        "command": "slice2cpp -Ishared shared/WordCount.ice -o nodo_cpp/",
+        "group": "build"
+      },
+      {
+        "label": "Generate slice2java",
+        "type": "shell",
+        "command": "slice2java -Ishared shared/WordCount.ice -o nodo_java/WordCounter",
+        "group": "build"
+      }
+    ]
+  }
+  

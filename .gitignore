@@ -1,0 +1,41 @@
+# Node and Gradle build directories
+.gradle/
+build/
+
+# Java build artifacts
+nodo_java/build/
+nodo_java/.gradle/
+nodo_java/build/libs/
+nodo_java/build/tmp/
+
+# C++ build artifacts
+nodo_cpp/build/
+nodo_cpp/CMakeFiles/
+nodo_cpp/CMakeCache.txt
+nodo_cpp/Makefile
+nodo_cpp/*.o
+nodo_cpp/*.obj
+nodo_cpp/*.pdb
+nodo_cpp/*.ilk
+nodo_cpp/*.exe
+nodo_cpp/*.log
+
+# Python artifacts
+maestro/__pycache__/
+maestro/*.pyc
+maestro/*.pyo
+maestro/.pytest_cache/
+
+# Shared generated files
+shared/*.cpp
+shared/*.h
+shared/*.java
+shared/*.py
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*.DS_Store
+

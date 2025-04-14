@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: Maestro",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/maestro/main.py",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "C++: Nodo",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/nodo_cpp/build/nodo_cpp",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/nodo_cpp",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
+      },
+      {
+        "type": "java",
+        "name": "Java: Nodo",
+        "request": "launch",
+        "mainClass": "Main",  // ⚠️ asegúrate de que el nombre y el paquete sean correctos
+        "projectName": "nodo_java"
+      }
+    ]
+  }
+  

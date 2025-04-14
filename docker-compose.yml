@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  maestro:
+    build:
+      context: .
+      dockerfile: maestro/Dockerfile
+    container_name: maestro
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./texts:/app/texts
+      - /tmp/chunks:/app/chunks
+      - ./referencias:/app/referencias
+      - ./shared:/app/shared
+    depends_on:
+      - nodo_java
+      - nodo_cpp
+    networks:
+      - ice_network
+
+  nodo_cpp:
+    build:
+      context: .
+      dockerfile: nodo_cpp/Dockerfile
+    container_name: nodo_cpp
+    working_dir: /app
+    volumes:
+      - ./texts:/app/texts
+      - /tmp/chunks:/app/chunks
+      - ./results:/app/results
+      - ./shared:/app/shared
+    expose:
+      - "10001"
+    networks:
+      - ice_network
+
+  nodo_java:
+    build:
+      context: .
+      dockerfile: nodo_java/Dockerfile
+    container_name: nodo_java
+    working_dir: /app
+    volumes:
+      - ./texts:/app/texts
+      - /tmp/chunks:/app/chunks
+      - ./results:/app/results
+      - ./shared:/app/shared
+    expose:
+      - "10000"
+    networks:
+      - ice_network
+
+  scope:
+    image: weaveworks/scope:1.13.2
+    container_name: scope
+    privileged: true
+    pid: "host"
+    network_mode: "host"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+networks:
+  ice_network:
